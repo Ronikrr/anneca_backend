@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const measurementSchema = mongoose.Schema({
-    size: {
-        type: String,
-        required: true,
-    },
+    // size: {
+    //     type: String,
+    //     required: true,
+    // },
     age: {
         type: String,
         required: true,
