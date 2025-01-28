@@ -343,10 +343,10 @@ const getAllProducts = catchAsyncErrors(async (req, res, next) => {
     ];
     filters.category = { $in: categoryIds };
   }
-
   const allProduct = await Product.find(filters)
-    // .skip(skip)
-    // .limit(limit)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
     .populate({ path: "category", select: { name: 1 } });
 
   const totalProductsCount = await Product.countDocuments(filters);
