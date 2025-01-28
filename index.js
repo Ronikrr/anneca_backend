@@ -99,9 +99,9 @@ app.set("view engine", "ejs");
 const allowedOrigins = [
   'https://www.annecafashion.com',
   'https://anneca-frontend.vercel.app',
-  'https://anneca-admin.vercel.app', 
+  'https://anneca-admin.vercel.app',
   'https://anneca-admin-beta.vercel.app',
-  'https://anneca-frontend-nine.vercel.app', 
+  'https://anneca-frontend-nine.vercel.app',
   'http://localhost:3000',
   'http://localhost:3001'
 ];
