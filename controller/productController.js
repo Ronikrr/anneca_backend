@@ -306,13 +306,70 @@ const getAllSellerProducts = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// const getAllProducts = catchAsyncErrors(async (req, res, next) => {
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 12;
+//   const skip = (page - 1) * limit;
+
+//   let filters = {};
+//   const { search, minPrice, maxPrice, category } = req.query;
+
+//   if (search) {
+//     filters.name = { $regex: new RegExp(search, "i") };
+//   }
+//   if (minPrice || maxPrice) {
+//     filters.price = {};
+//     if (minPrice) filters.price.$gte = parseInt(minPrice);
+//     if (maxPrice) filters.price.$lte = parseInt(maxPrice);
+//   }
+
+//   if (category) {
+//     const parentCategory = await Category.findOne({
+//       name: { $regex: new RegExp(category, "i") },
+//     });
+//     if (!parentCategory) {
+//       return res.status(StatusCodes.NOT_FOUND).json({
+//         status: StatusCodes.NOT_FOUND,
+//         success: false,
+//         message: `Category with name "${category}" not found.`,
+//       });
+//     }
+//     const subcategories = await Category.find({
+//       parent_category: parentCategory._id,
+//     });
+//     const categoryIds = [
+//       parentCategory._id,
+//       ...subcategories.map((sub) => sub._id),
+//     ];
+//     filters.category = { $in: categoryIds };
+//   }
+
+//   const allProduct = await Product.find(filters)
+//     // .skip(skip)
+//     // .limit(limit)
+//     .populate({ path: "category", select: { name: 1 } });
+
+//   const totalProductsCount = await Product.countDocuments(filters);
+
+//   res.status(StatusCodes.OK).json({
+//     data: allProduct,
+//     status: StatusCodes.OK,
+//     success: true,
+//     currentPage: page,
+//     totalPages: Math.ceil(totalProductsCount / limit),
+//     totalProductsCount,
+//   });
+// });
+
+//get singel product
+
 const getAllProducts = catchAsyncErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 12;
   const skip = (page - 1) * limit;
 
   let filters = {};
-  const { search, minPrice, maxPrice, category } = req.query;
+  const { search, minPrice, maxPrice, category, sortOrder } = req.query;
 
   if (search) {
     filters.name = { $regex: new RegExp(search, "i") };
@@ -344,9 +401,18 @@ const getAllProducts = catchAsyncErrors(async (req, res, next) => {
     filters.category = { $in: categoryIds };
   }
 
+  // Determine the sorting order
+  const sortOptions = {};
+  if (sortOrder === "desc") {
+    sortOptions.createdAt = -1; // Newest first
+  } else {
+    sortOptions.createdAt = 1; // Oldest first
+  }
+
   const allProduct = await Product.find(filters)
-    // .skip(skip)
-    // .limit(limit)
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(limit)
     .populate({ path: "category", select: { name: 1 } });
 
   const totalProductsCount = await Product.countDocuments(filters);
@@ -361,7 +427,7 @@ const getAllProducts = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//get singel product
+
 const getProductDetails = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id).populate({
     path: "category",
